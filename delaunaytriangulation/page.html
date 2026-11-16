@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+	<body style="overflow:hidden;"><div>
+        <button type="button" id="calculateButton">Calculate</button>
+        <input type="number" id="stepSpeedBox">suggested: 0.1</input>
+        <button type="button" id="changeSpeedButton">Set step speed</button>
+    </div>
+		<canvas id="canvas" width="1920" height="900"
+            style="position:absolute; left:0; top:0; z-index:-1; border:0px solid #00ffff;">
+		
+		<script>
+		window.oncontextmenu = (e) => {
+			e.preventDefault();
+		}
+		</script>
+		<script src="delaunay_triangulation.js"></script>
+        <script>
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+var calculateButton = document.getElementById("calculateButton");
+var stepSpeedBox = document.getElementById("stepSpeedBox");
+var changeSpeedButton = document.getElementById("changeSpeedButton");
+
+// "ADD", "REM",
+var mode = "";
+var mouseX = 0, mouseY = 0;
+
+let vecs = [];
+let arcs = [];
+let split = null;
+let frame = -1;
+let frameSpeed = 1;
+
+function quantize(val, increment=25){
+    return Math.round(val / increment) * increment
+}
+
+canvas.onmousemove = function(event){
+	mouseX = (event.clientX);
+	mouseY = (event.clientY);
+};
+canvas.onpointermove = canvas.onmousemove;
+canvas.onpointerdown = function(){
+    let fail = false;
+    for(let i = 0; i < vecs.length; i++){
+        if(vecs[i].x == mouseX && vecs[i].y == mouseY){
+            fail = true;
+            break;
+        }
+    }
+    if(!fail){
+        vecs[vecs.length] = new Vec(mouseX, mouseY, vecs.length);
+    }
+};
+changeSpeedButton.onclick = function(){
+    frameSpeed = parseFloat(stepSpeedBox.value, 10);
+}
+calculateButton.onclick = function(){
+    split = new Split();
+
+    for(let i = 0; i < vecs.length; i++){
+        while(vecs[i].firstArc != null){
+            vecs[i].firstArc.remove();
+        }
+    }
+    arcs = guibasStolfi(vecs, [], null, null, null, split);
+    
+    // alert("The length of arcs is "+arcs.length);
+    
+    if(frameSpeed <= 0){
+        frame = -1;
+    }
+    else {
+        frame = 0;
+    }
+
+    // idea on how to make this into an animation:
+    // record events
+    // - group <groupIndex> -> make a group
+    // - include <pointIndex> <groupIndex> -> add a point to a group
+    // - dissolve <groupIndex> -> dissolve a group
+    // - addEdge <pointIndex> <pointIndex> -> make an edge
+    // - removeEdge <pointIndex> <pointIndex> -> remove an edge
+    // - add
+}
+
+
+function loop(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.beginPath();
+    ctx.rect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle="#111111";
+    ctx.fill();
+    ctx.closePath();
+
+	if(frame > getLastCreatedStep(arcs)){
+        frame = -1;
+    }
+    if(frame > -1){
+        drawArcsAndVecs(ctx, arcs, null, Math.floor(frame), split);
+        frame = frame + frameSpeed;
+    }
+    else{
+        drawArcsAndVecs(ctx, arcs, vecs);
+    }
+
+    requestAnimationFrame(loop);
+}
+
+loop();
+        </script>
+	</body>
+</html>
