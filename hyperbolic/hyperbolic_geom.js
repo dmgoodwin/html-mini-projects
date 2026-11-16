@@ -318,8 +318,6 @@ function HomoRot(xx=1, xy=0, xz=0, yx=0, yy=1, yz=0, zx=0, zy=0, zz=1){
 // ### C_D is the point you want
 // rotate it around 
 
-// to go some distance in hyperbolic space:
-
 // to correct a matrix M
 // xz and yz will have rotation information; zx and zy won't
 // get the equation for the cosine and sine of your rotation information
