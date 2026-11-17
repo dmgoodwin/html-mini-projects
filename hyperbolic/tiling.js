@@ -12,10 +12,12 @@ function HyperbolicNode(acrossFrom = null, whichNeighbor = -1, numNeighbors=5, o
 	if(acrossFrom != null) {
 		this.orientation = -(acrossFrom.orientation);
 		this.numNeighbors = acrossFrom.numNeighbors;
+		this.seed = null;
 	}
 	else{
 		this.numNeighbors = numNeighbors;
 		this.orientation = orientation;
+		this.seed = new TileSeed(EDGE_START_SEED.slice());
 	}
 	this.neighbors = [];
 	for(let i = 0; i < this.numNeighbors; i++){
@@ -88,6 +90,7 @@ function HyperbolicNode(acrossFrom = null, whichNeighbor = -1, numNeighbors=5, o
 	
 }
 
+// 
 function buildNodeGraph(steps=2) {
 	let numNodes = 0;
 	let traversalOrder = [];
@@ -113,6 +116,7 @@ function buildNodeGraph(steps=2) {
 					thisStepNodes[numThisStepNodes++] = x;
 					traversalOrder[numNodes] = x;
 					x.nodeIndex = numNodes++;
+					x.seed = new TileSeed(u.seed.flipAround(vIndex), -u.seed.orientation);
 					console.log("Node <"+u.nodeIndex+"> has no "+vIndex+" neighbor. Creating neighbor <"+x.nodeIndex+">");
 					//console.log(u);
 				}
@@ -129,11 +133,13 @@ function buildNodeGraph(steps=2) {
 				let w = u.getNeighbor(wIndex);
 				
 				if(failAroundThruW && failAroundThruV){
-					let x = new HyperbolicNode(v, v.backNeighborIndex(vIndex));
+					let neighbor = v.backNeighborIndex(vIndex);
+					let x = new HyperbolicNode(v, neighbor);
 					thisStepNodes[numThisStepNodes++] = x;
 					traversalOrder[numNodes] = x;
 					w.setNeighbor(w.frontNeighborIndex(wIndex), x);
 					x.nodeIndex = numNodes++;
+					x.seed = new TileSeed(v.seed.flipAround(neighbor), -v.seed.orientation);
 					console.log("Corner at <"+u.nodeIndex+">, between <"+v.nodeIndex+"> and <"+w.nodeIndex+">, needed across "+vIndex+" and "+wIndex+". Creating neighbor <"+x.nodeIndex+">");
 					//console.log(v);
 					//console.log(w);

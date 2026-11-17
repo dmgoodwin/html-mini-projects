@@ -92,6 +92,8 @@ function HyperbolicPentagonTiling(numSteps=2){
     ///////////////////////////////////////////////////////////////
 
     // do this in order!
+    // this takes the list of tiles and gives them each a rotation matrix
+    // not pentagon vertices (yet)
     this.loadMatrix = function(tileNode) {
 
         if(tileNode.parentIndex == -1){

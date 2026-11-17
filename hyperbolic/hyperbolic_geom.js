@@ -1,5 +1,12 @@
+// author: Dereene Goodwin
+// title: hyperbolic_geom.js
+// purpose: A library for hyperbolic mathematics
 
 
+// "homogeneous vector"
+// either representing a point on (or aiming towards a point on) x^2 + y^2 - z^2 = 1,
+// or a point on (or aiming towards a point on) x^2 + y^2 - z^2 = -1.
+// if the former, it's a "point". if the latter, it's a "line".
 function HomoVec(x,y,z=1.0){
 
     this.x = x;
@@ -10,6 +17,13 @@ function HomoVec(x,y,z=1.0){
 
         this.x = -this.x;
         this.y = -this.y;
+        return this;
+    }
+
+    this.flipAll = function() {
+        this.x = -this.x;
+        this.y = -this.y;
+        this.z = -this.z;
         return this;
     }
 
@@ -37,11 +51,13 @@ function HomoVec(x,y,z=1.0){
         return this.z*that.z + this.x*that.x + this.y*that.y;
     }
 
+    // this IS correct for hyperbolic space.
     this.inner_product = function(that){
 
         return this.z*that.z - this.x*that.x - this.y*that.y;
     }
 
+    // this is like cross product for hyperbolic vectors.
     this.outer_product = function(that){
 
         // the z is flipped
@@ -139,6 +155,7 @@ function HomoVec_copy(homovec){
     return new HomoVec(homovec.x, homovec.y, homovec.z);
 }
 
+// "homogeneous rotation" i.e. a 3x3 matrix used for determining position And rotation on the hyperbolic plane
 function HomoRot(xx=1, xy=0, xz=0, yx=0, yy=1, yz=0, zx=0, zy=0, zz=1){
 
     this.xx = xx; this.xy = xy; this.xz = xz;
@@ -242,6 +259,7 @@ function HomoRot(xx=1, xy=0, xz=0, yx=0, yy=1, yz=0, zx=0, zy=0, zz=1){
         return ret;
     }
 
+    // removes the translation from the matrix
     this.rtDecomp = function(){
         // [-zx -zy] [ C]   [ xz]
         // [-zy  zx] [ S] = [ yz]
@@ -302,6 +320,7 @@ function HomoRot(xx=1, xy=0, xz=0, yx=0, yy=1, yz=0, zx=0, zy=0, zz=1){
     }
 }
 
+// TODO
 // to get a right pentagon in beltrami-klein:
 // -> draw a five-pointed star centered at origin
 // -> 1/A distance from center to point -- first point at (1/A, 0)
@@ -318,6 +337,7 @@ function HomoRot(xx=1, xy=0, xz=0, yx=0, yy=1, yz=0, zx=0, zy=0, zz=1){
 // ### C_D is the point you want
 // rotate it around 
 
+// TODO -- unless this is already HomoVec.normalize()? 
 // to correct a matrix M
 // xz and yz will have rotation information; zx and zy won't
 // get the equation for the cosine and sine of your rotation information
